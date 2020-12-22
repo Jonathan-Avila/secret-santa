@@ -33,7 +33,7 @@ def main():
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = "jonathansraspberrypi@gmail.com"  # Enter your the sender's email address
-    password = input("Please enter your password: "") #coconutcreampie
+    password = input("Please enter your password: ")
     for key in a_dict:
         recipient_name = a_dict[key]
         giver_email = personal_info_dict[key][0]

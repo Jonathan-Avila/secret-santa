@@ -1,3 +1,5 @@
+
+import secret_santa_config
 from random import shuffle
 import smtplib, ssl
 
@@ -11,8 +13,8 @@ def randomized_dict(names_1,names_2):
     return a_dict
 
 def set_gift_order():
-    names_1 = [] # Enter the names of all the paricipants here as comma separated strings in a list i.e. ["Anna", "Beth", "Charlie"]
-    names_2 = []
+    list_of_names = secret_santa_config.get_names_of_participants()
+    copy_of_names = []
     """
     name = " "
 
@@ -21,14 +23,13 @@ def set_gift_order():
         names_1.append(name)
     names_1.pop(-1)
     """
-    for element in names_1:
-        names_2.append(element)
+    for element in list_of_names:
+        copy_of_names.append(element)
 
-    return randomized_dict(names_1,names_2)
+    return randomized_dict(list_of_names,copy_of_names)
 
 def main():
-    personal_info_dict = {} # Enter the info of all the paricipants here as a dict with names as keys and a tuple containing an email address and physical address as the value i.e. {"Anna":(anna@email.com, "111 Main st") "Beth":(beth@email.com, "222 Main st") "Charlie":(charlie@email.com, "333 Main st")}
-
+    personal_info_dict = secret_santa_config.get_personal_info_dict()
     a_dict = set_gift_order()
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"

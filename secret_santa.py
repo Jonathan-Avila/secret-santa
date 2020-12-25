@@ -7,8 +7,11 @@ def randomized_dict(names_1,names_2):
     shuffle(names_1)
     shuffle(names_2)
     a_dict = dict(zip(names_1,names_2))
+    
     for key in a_dict:
-        if key == a_dict[key] or a_dict[a_dict[key]] == key: # person cannot be their own secret santa. Nor can the receiver be the Secret Santa's Secret Santa
+        recipent_of_recipient = a_dict[a_dict[key]]
+        recipent_grandson = a_dict[recipent_of_recipient]
+        if key == a_dict[key] or recipent_of_recipient == key or recipent_grandson == key: # person cannot be their own secret santa. Nor can the receiver be the Secret Santa's Secret Santa
             return randomized_dict(names_1,names_2)
     return a_dict
 

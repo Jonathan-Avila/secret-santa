@@ -1,39 +1,36 @@
 
 import secret_santa_config
 from random import shuffle
-import smtplib, ssl
+import smtplib
+import ssl
 
 def set_gift_order():
     list_of_names = secret_santa_config.get_names_of_participants()
     copy_of_names = []
     num_of_participants = len(list_of_names)
-
-    list_of_numbers = []
-    for i in range(1, num_of_participants + 1):
-        list_of_numbers.append(i)
+    list_of_numbers = list(range(num_of_participants + 1))[1:]
     shuffle(list_of_names)
     shuffle(list_of_numbers)
     gift_order_dict = dict(zip(list_of_numbers,list_of_names))
-
     return gift_order_dict, num_of_participants
 
 def main():
     personal_info_dict = secret_santa_config.get_personal_info_dict()
-    a_dict, num_of_participants = set_gift_order()
+    gift_order_dict, num_of_participants = set_gift_order()
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
-    sender_email = "jonathansraspberrypi@gmail.com"  # Enter your the sender's email address
-    password = input("Please enter your password: ")
-    for key in a_dict:
-        giver_name = a_dict[key]
+    sender_email = secret_santa_config.get_sender_email()
+    password = input("Please enter your password: ") # Password for email being used
+    for key in gift_order_dict:
+        giver_name = gift_order_dict[key]
         giver_email = personal_info_dict[giver_name][0]
         if key == num_of_participants:
-            recipient_name = a_dict[1]
-            recipient_address = personal_info_dict[a_dict[1]][1]
+            recipient_name = gift_order_dict[1]
+            recipient_address = personal_info_dict[gift_order_dict[1]][1]
         else:
-            recipient_name = a_dict[key + 1]
-            recipient_address = personal_info_dict[a_dict[key + 1]][1]
-        givers_email = personal_info_dict[a_dict[key]][0]  # Enter receiver address
+            recipient_name = gift_order_dict[key + 1]
+            recipient_address = personal_info_dict[gift_order_dict[key + 1]][1]
+        givers_email = personal_info_dict[gift_order_dict[key]][0]  # Enter receiver address
         message = """\
         Secret Santa
 

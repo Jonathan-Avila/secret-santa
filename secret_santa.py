@@ -3,47 +3,37 @@ import secret_santa_config
 from random import shuffle
 import smtplib, ssl
 
-def randomized_dict(names_1,names_2):
-    shuffle(names_1)
-    shuffle(names_2)
-    a_dict = dict(zip(names_1,names_2))
-    
-    for key in a_dict:
-        recipent_of_recipient = a_dict[a_dict[key]]
-        recipent_grandson = a_dict[recipent_of_recipient]
-        if key == a_dict[key] or recipent_of_recipient == key or recipent_grandson == key: # person cannot be their own secret santa. Nor can the receiver be the Secret Santa's Secret Santa
-            return randomized_dict(names_1,names_2)
-    return a_dict
-
 def set_gift_order():
     list_of_names = secret_santa_config.get_names_of_participants()
     copy_of_names = []
-    """
-    name = " "
+    num_of_participants = len(list_of_names)
 
-    while name != "":
-        name = input("Enter a Name  or Leave Blank and Press Enter If There Are No More Names to Enter: ")
-        names_1.append(name)
-    names_1.pop(-1)
-    """
-    for element in list_of_names:
-        copy_of_names.append(element)
+    list_of_numbers = []
+    for i in range(1, num_of_participants + 1):
+        list_of_numbers.append(i)
+    shuffle(list_of_names)
+    shuffle(list_of_numbers)
+    gift_order_dict = dict(zip(list_of_numbers,list_of_names))
 
-    return randomized_dict(list_of_names,copy_of_names)
+    return gift_order_dict, num_of_participants
 
 def main():
     personal_info_dict = secret_santa_config.get_personal_info_dict()
-    a_dict = set_gift_order()
+    a_dict, num_of_participants = set_gift_order()
     port = 465  # For SSL
     smtp_server = "smtp.gmail.com"
     sender_email = "jonathansraspberrypi@gmail.com"  # Enter your the sender's email address
     password = input("Please enter your password: ")
     for key in a_dict:
-        recipient_name = a_dict[key]
-        giver_email = personal_info_dict[key][0]
-        recipient_address = personal_info_dict[a_dict[key]][1]
-
-        receiver_email = giver_email  # Enter receiver address
+        giver_name = a_dict[key]
+        giver_email = personal_info_dict[giver_name][0]
+        if key == num_of_participants:
+            recipient_name = a_dict[1]
+            recipient_address = personal_info_dict[a_dict[1]][1]
+        else:
+            recipient_name = a_dict[key + 1]
+            recipient_address = personal_info_dict[a_dict[key + 1]][1]
+        givers_email = personal_info_dict[a_dict[key]][0]  # Enter receiver address
         message = """\
         Secret Santa
 
@@ -52,13 +42,11 @@ def main():
         You are {}\'s Secret Santa. Their address is: {}
 
 
-        This is an automated message sent by Jonathan's script. Jonathan does not know the contents of this email.""".format(key, recipient_name, recipient_address)
+        This is an automated message sent by Jonathan's script. Jonathan does not know the contents of this email.""".format(giver_name, recipient_name, recipient_address)
 
         context = ssl.create_default_context()
         with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
             server.login(sender_email, password)
-            server.sendmail(sender_email, receiver_email, message)
-
-
+            server.sendmail(sender_email, givers_email, message)
 
 main()
